@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSB Matrimonial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#c9a84c; --gold-light:#e8c97a; --cream:#fdf8f0; --dark:#1a1208;
+    --brown:#5c3d1e; --muted:#8a7560; --card-bg:#ffffff; --border:#e8dcc8; --tag-bg:#f5ede0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
+
+  header{background:var(--dark);padding:24px 40px;display:flex;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--gold);}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--gold-light);letter-spacing:.04em;}
+  .logo span{font-style:italic;color:#fff;}
+  .header-sub{font-size:.72rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:2px;}
+
+  .filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:14px 40px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+  .filter-bar label{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:4px;}
+  .filter-bar select,.filter-bar input{padding:6px 12px;border:1px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--dark);background:var(--cream);outline:none;cursor:pointer;transition:border-color .2s;}
+  .filter-bar select:focus,.filter-bar input:focus{border-color:var(--gold);}
+  .filter-group{display:flex;align-items:center;gap:6px;}
+  .count-badge{margin-left:auto;font-size:.78rem;color:var(--muted);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:28px;padding:36px 40px;max-width:1400px;margin:0 auto;}
+
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease;cursor:pointer;animation:fadeUp .4s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(90,60,10,.12);}
+
+  .card-photos{position:relative;height:260px;background:#f0e8d8;overflow:hidden;}
+  .photo-track{display:flex;height:100%;transition:transform .4s ease;}
+  .photo-track img{width:100%;height:100%;object-fit:cover;flex-shrink:0;}
+  .photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);background:linear-gradient(135deg,#f5ede0 0%,#ede0cc 100%);font-size:3rem;}
+  .photo-placeholder p{font-size:.78rem;margin-top:8px;}
+  .photo-nav{position:absolute;bottom:10px;right:12px;display:flex;gap:6px;z-index:2;}
+  .photo-nav button{width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:var(--dark);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:background .2s;}
+  .photo-nav button:hover{background:#fff;}
+  .photo-dots{position:absolute;bottom:12px;left:12px;display:flex;gap:4px;}
+  .photo-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .2s;}
+  .photo-dots span.active{background:#fff;}
+  .gender-badge{position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(6px);}
+  .gender-badge.male{background:rgba(30,90,180,.75);color:#fff;}
+  .gender-badge.female{background:rgba(180,30,90,.75);color:#fff;}
+
+  .card-body{padding:20px 22px 22px;}
+  .card-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--dark);line-height:1.2;}
+  .card-sub{font-size:.78rem;color:var(--muted);margin-top:3px;}
+  .divider{height:1px;background:var(--border);margin:14px 0;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
+  .info-item label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:1px;}
+  .info-item span{font-size:.82rem;color:var(--dark);font-weight:500;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .tag{background:var(--tag-bg);border:1px solid var(--border);color:var(--brown);font-size:.7rem;padding:3px 9px;border-radius:20px;letter-spacing:.04em;}
+  .tag.highlight{background:var(--gold);border-color:var(--gold);color:var(--dark);font-weight:500;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,5,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card-bg);border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .3s ease;}
+  @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+  .modal-close{position:sticky;top:0;display:flex;justify-content:flex-end;padding:14px 18px 0;background:var(--card-bg);z-index:1;}
+  .modal-close button{width:32px;height:32px;border:1px solid var(--border);background:var(--cream);border-radius:50%;cursor:pointer;font-size:1rem;color:var(--dark);display:flex;align-items:center;justify-content:center;}
+  .modal-photos{display:flex;gap:8px;overflow-x:auto;padding:10px 20px 6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
+  .modal-photos img{height:200px;border-radius:8px;flex-shrink:0;scroll-snap-align:start;object-fit:cover;}
+  .modal-body{padding:20px 26px 28px;}
+  .modal-name{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--dark);}
+  .modal-section{margin-top:20px;}
+  .modal-section h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+  .modal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 20px;}
+  .modal-field label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;}
+  .modal-field span{font-size:.85rem;color:var(--dark);}
+
+  .state-msg{text-align:center;padding:80px 20px;color:var(--muted);grid-column:1/-1;}
+  .state-msg h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:8px;}
+  .state-msg p{font-size:.85rem;line-height:1.6;}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  @media(max-width:600px){
+    header{padding:16px 20px;}
+    .filter-bar{padding:12px 16px;gap:8px;}
+    .grid{padding:20px 16px;gap:20px;}
+    .count-badge{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">GSB <span>Matrimonial</span></div>
+    <div class="header-sub">Gaud Saraswat Brahmin Community</div>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <div class="filter-group"><label>Gender</label>
+    <select id="filterGender" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+  </div>
+  <div class="filter-group"><label>Country</label>
+    <select id="filterCountry" onchange="applyFilters()"><option value="">All</option></select>
+  </div>
+  <div class="filter-group"><label>Diet</label>
+    <select id="filterDiet" onchange="applyFilters()"><option value="">All</option></select>
+  </div>
+  <div class="filter-group"><label>Search</label>
+    <input type="text" id="searchInput" placeholder="Name, city, occupation..." oninput="applyFilters()" style="width:200px">
+  </div>
+  <div class="count-badge" id="countBadge"></div>
+</div>
+
+<div class="grid" id="profileGrid">
+  <div class="state-msg"><div class="spinner"></div><h2>Loading profiles...</h2></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-close"><button onclick="closeModalDirect()">X</button></div>
+    <div class="modal-photos" id="modalPhotos"></div>
+    <div class="modal-body"  id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  // ── PASTE YOUR APPS SCRIPT WEB APP URL HERE ───────────────
+  var WEB_APP_URL = "YOUR_WEB_APP_URL";
+  // ─────────────────────────────────────────────────────────
+
+  var ALL_PROFILES     = [];
+  var filteredProfiles = [];
+
+  function extractFileId(url) {
+    if (!url) return null;
+    var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    return null;
+  }
+
+  function driveToImg(url) {
+    if (!url || !url.trim()) return null;
+    url = url.trim();
+    if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) return url;
+    var fileId = extractFileId(url);
+    if (!fileId) return null;
+    return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w600';
+  }
+
+  function parsePhotos(raw) {
+    if (!raw) return [];
+    var parts  = raw.split(',');
+    var result = [];
+    for (var i = 0; i < parts.length; i++) {
+      var converted = driveToImg(parts[i]);
+      if (converted) result.push(converted);
+    }
+    return result;
+  }
+
+  function calcAge(dob) {
+    if (!dob) return '-';
+    var d;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
+      var pts = dob.split('/');
+      d = new Date(pts[2] + '-' + pts[1] + '-' + pts[0]);
+    } else {
+      d = new Date(dob);
+    }
+    if (isNaN(d.getTime())) return '-';
+    var age = Math.floor((Date.now() - d) / (365.25 * 24 * 3600 * 1000));
+    return (age > 0 && age < 100) ? age + ' yrs' : '-';
+  }
+
+  function loadProfiles() {
+    if (!WEB_APP_URL || WEB_APP_URL === 'YOUR_WEB_APP_URL') {
+      showError('Please paste your Apps Script Web App URL into the WEB_APP_URL variable in this file.');
+      return;
+    }
+    fetch(WEB_APP_URL)
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        if (data.error) throw new Error(data.error);
+        ALL_PROFILES = data;
+        populateFilters();
+        applyFilters();
+      })
+      .catch(function(err) {
+        showError('Could not load profiles: ' + err.message +
+          '<br><br>Make sure the Web App is deployed with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>.');
+      });
+  }
+
+  function showError(msg) {
+    document.getElementById('profileGrid').innerHTML =
+      '<div class="state-msg"><h2>Error</h2><p>' + msg + '</p></div>';
+    document.getElementById('countBadge').textContent = '';
+  }
+
+  function populateFilters() {
+    var countries = [];
+    var diets     = [];
+    var seenC     = {};
+    var seenD     = {};
+    var i, p, opt;
+    for (i = 0; i < ALL_PROFILES.length; i++) {
+      p = ALL_PROFILES[i];
+      if (p.country && !seenC[p.country]) { countries.push(p.country); seenC[p.country] = true; }
+      if (p.diet    && !seenD[p.diet])    { diets.push(p.diet);        seenD[p.diet]    = true; }
+    }
+    countries.sort(); diets.sort();
+    var cSel = document.getElementById('filterCountry');
+    var dSel = document.getElementById('filterDiet');
+    cSel.innerHTML = '<option value="">All</option>';
+    dSel.innerHTML = '<option value="">All</option>';
+    for (i = 0; i < countries.length; i++) {
+      opt = document.createElement('option');
+      opt.value = countries[i]; opt.textContent = countries[i];
+      cSel.appendChild(opt);
+    }
+    for (i = 0; i < diets.length; i++) {
+      opt = document.createElement('option');
+      opt.value = diets[i]; opt.textContent = diets[i];
+      dSel.appendChild(opt);
+    }
+  }
+
+  function applyFilters() {
+    var gender  = document.getElementById('filterGender').value;
+    var country = document.getElementById('filterCountry').value;
+    var diet    = document.getElementById('filterDiet').value;
+    var search  = document.getElementById('searchInput').value.toLowerCase();
+    filteredProfiles = [];
+    for (var i = 0; i < ALL_PROFILES.length; i++) {
+      var p = ALL_PROFILES[i];
+      if (gender  && p.gender  !== gender)  continue;
+      if (country && p.country !== country) continue;
+      if (diet    && p.diet    !== diet)    continue;
+      if (search) {
+        var hay = ((p.firstName||'') + ' ' + (p.lastName||'') + ' ' + (p.city||'') + ' ' +
+                   (p.country||'') + ' ' + (p.occupation||'') + ' ' + (p.education||'')).toLowerCase();
+        if (hay.indexOf(search) === -1) continue;
+      }
+      filteredProfiles.push(p);
+    }
+    renderGrid();
+  }
+
+  function renderGrid() {
+    var grid  = document.getElementById('profileGrid');
+    var count = filteredProfiles.length;
+    document.getElementById('countBadge').textContent = count + ' profile' + (count !== 1 ? 's' : '');
+    grid.innerHTML = '';
+    if (count === 0) {
+      grid.innerHTML = '<div class="state-msg"><h2>No profiles match your filters</h2></div>';
+      return;
+    }
+    for (var i = 0; i < filteredProfiles.length; i++) {
+      grid.appendChild(createCard(filteredProfiles[i], i));
+    }
+  }
+
+  function trunc(s, n) {
+    if (!s) return '-';
+    return s.length > n ? s.substring(0, n) + '...' : s;
+  }
+
+  function createCard(p, idx) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = Math.min(idx * 60, 400) + 'ms';
+
+    var photoArea = document.createElement('div');
+    photoArea.className = 'card-photos';
+    var photos = parsePhotos(p.photos);
+
+    if (photos.length > 0) {
+      var track = document.createElement('div');
+      track.className = 'photo-track';
+      var j, img;
+      for (j = 0; j < photos.length; j++) {
+        img = document.createElement('img');
+        img.src     = photos[j];
+        img.alt     = (p.firstName || '');
+        img.loading = 'lazy';
+        img.onerror = function() { this.style.display = 'none'; };
+        track.appendChild(img);
+      }
+      photoArea.appendChild(track);
+
+      if (photos.length > 1) {
+        var dots = document.createElement('div');
+        dots.className = 'photo-dots';
+        for (j = 0; j < photos.length; j++) {
+          var dot = document.createElement('span');
+          if (j === 0) dot.className = 'active';
+          dots.appendChild(dot);
+        }
+        photoArea.appendChild(dots);
+
+        var nav  = document.createElement('div'); nav.className = 'photo-nav';
+        var prev = document.createElement('button'); prev.textContent = '<';
+        var next = document.createElement('button'); next.textContent = '>';
+        nav.appendChild(prev); nav.appendChild(next);
+        photoArea.appendChild(nav);
+
+        (function(tr, dt, total) {
+          var cur = 0;
+          function update() {
+            tr.style.transform = 'translateX(-' + (cur * 100) + '%)';
+            var allDots = dt.querySelectorAll('span');
+            for (var k = 0; k < allDots.length; k++) {
+              allDots[k].className = k === cur ? 'active' : '';
+            }
+          }
+          prev.onclick = function(e) { e.stopPropagation(); cur = (cur - 1 + total) % total; update(); };
+          next.onclick = function(e) { e.stopPropagation(); cur = (cur + 1) % total; update(); };
+        })(track, dots, photos.length);
+      }
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'photo-placeholder';
+      ph.innerHTML = (p.gender === 'Female' ? '&#128105;' : '&#128104;') + '<p>Photo not uploaded</p>';
+      photoArea.appendChild(ph);
+    }
+
+    var badge = document.createElement('div');
+    badge.className = 'gender-badge ' + (p.gender === 'Female' ? 'female' : 'male');
+    badge.textContent = p.gender || '';
+    photoArea.appendChild(badge);
+    card.appendChild(photoArea);
+
+    var loc  = [p.city, p.country].filter(function(x) { return !!x; }).join(', ');
+    var body = document.createElement('div'); body.className = 'card-body';
+    var nameEl = document.createElement('div'); nameEl.className = 'card-name';
+    nameEl.textContent = (p.firstName || '') + ' ' + (p.lastName || '');
+    var subEl = document.createElement('div'); subEl.className = 'card-sub';
+    subEl.textContent = loc;
+    var divEl = document.createElement('div'); divEl.className = 'divider';
+    var infoGrid = document.createElement('div'); infoGrid.className = 'info-grid';
+    infoGrid.appendChild(makeInfoItem('Age',       calcAge(p.dob)));
+    infoGrid.appendChild(makeInfoItem('Height',    p.height    || '-'));
+    infoGrid.appendChild(makeInfoItem('Education', trunc(p.education, 30)));
+    infoGrid.appendChild(makeInfoItem('Gotra',     p.gotra     || '-'));
+    var tags = document.createElement('div'); tags.className = 'tags';
+    var tagEl;
+    if (p.diet)     { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.diet;     tags.appendChild(tagEl); }
+    if (p.matha)    { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.matha;    tags.appendChild(tagEl); }
+    if (p.euStatus) { tagEl = document.createElement('span'); tagEl.className = 'tag highlight'; tagEl.textContent = p.euStatus; tags.appendChild(tagEl); }
+    body.appendChild(nameEl); body.appendChild(subEl); body.appendChild(divEl);
+    body.appendChild(infoGrid); body.appendChild(tags);
+    card.appendChild(body);
+    card.onclick = function() { openModal(p); };
+    return card;
+  }
+
+  function openModal(p) {
+    var photosEl = document.getElementById('modalPhotos');
+    var bodyEl   = document.getElementById('modalBody');
+    photosEl.innerHTML = '';
+    var photos = parsePhotos(p.photos);
+    for (var i = 0; i < photos.length; i++) {
+      var img = document.createElement('img');
+      img.src = photos[i]; img.alt = p.firstName || '';
+      img.onerror = function() { this.style.display = 'none'; };
+      photosEl.appendChild(img);
+    }
+    bodyEl.innerHTML = '';
+    var nameEl = document.createElement('div'); nameEl.className = 'modal-name';
+    nameEl.textContent = (p.firstName || '') + ' ' + (p.lastName || '');
+    var subEl = document.createElement('div');
+    subEl.style.cssText = 'color:var(--muted);font-size:.8rem;margin-top:4px';
+    var loc = [p.city, p.country].filter(function(x) { return !!x; }).join(', ');
+    subEl.textContent = (p.occupation || '') + (loc ? ' - ' + loc : '');
+    bodyEl.appendChild(nameEl); bodyEl.appendChild(subEl);
+    bodyEl.appendChild(makeSection('Personal Details', [
+      ['Age / DOB',          calcAge(p.dob) + ' / ' + (p.dob || '-')],
+      ['Height',             p.height],       ['Weight Range',  p.weightRange],
+      ['Body Type',          p.bodyType],      ['Complexion',    p.complexion],
+      ['Dietary Preference', p.diet],          ['Siblings',      p.siblings]
+    ]));
+    bodyEl.appendChild(makeSection('Location & Career', [
+      ['Country', p.country], ['City', p.city],
+      ['EU Status', p.euStatus], ['Years in EU', p.euYears],
+      ['Education', p.education], ['Occupation', p.occupation]
+    ]));
+    bodyEl.appendChild(makeSection('Community & Religious Details', [
+      ['Community', p.community], ['Gotra', p.gotra],
+      ['Nakshatra', p.nakshatra], ['Matha', p.matha],
+      ['Kuladeva',  p.kuladeva],  ['Native Place', p.nativePlace],
+      ['Konkani Dialect', p.dialect]
+    ]));
+    bodyEl.appendChild(makeSection('Family', [
+      ['Father', p.fatherInfo], ['Mother', p.motherInfo]
+    ]));
+    bodyEl.appendChild(makeSection('Partner Preferences', [
+      ['Preferred Location',   p.prefLocation],  ['Dietary Preference', p.prefDiet],
+      ['Horoscope Matching',   p.horoscopeReq],  ['Preferred Height',   p.prefHeightRange],
+      ['Education Preference', p.prefEducation], ['Career Preference',  p.prefCareer]
+    ]));
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+  function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModalDirect(); });
+
+  function makeInfoItem(lbl, val) {
+    var div = document.createElement('div'); div.className = 'info-item';
+    var l = document.createElement('label'); l.textContent = lbl;
+    var sp = document.createElement('span'); sp.textContent = val || '-';
+    div.appendChild(l); div.appendChild(sp); return div;
+  }
+  function makeField(lbl, val) {
+    var div = document.createElement('div'); div.className = 'modal-field';
+    var l = document.createElement('label'); l.textContent = lbl;
+    var sp = document.createElement('span'); sp.textContent = val || '-';
+    div.appendChild(l); div.appendChild(sp); return div;
+  }
+  function makeSection(title, fields) {
+    var sec = document.createElement('div'); sec.className = 'modal-section';
+    var h3  = document.createElement('h3');  h3.textContent = title;
+    var grid = document.createElement('div'); grid.className = 'modal-grid';
+    sec.appendChild(h3);
+    for (var i = 0; i < fields.length; i++) grid.appendChild(makeField(fields[i][0], fields[i][1]));
+    sec.appendChild(grid); return sec;
+  }
+
+  loadProfiles();
+</script>
+</body>
+</html>
