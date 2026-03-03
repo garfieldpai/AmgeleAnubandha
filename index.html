@@ -353,10 +353,6 @@
       photoArea.appendChild(ph);
     }
 
-    var badge = document.createElement('div');
-    badge.className = 'gender-badge ' + (p.gender === 'Female' ? 'female' : 'male');
-    badge.textContent = p.gender || '';
-    photoArea.appendChild(badge);
     card.appendChild(photoArea);
 
     var loc  = [p.city, p.country].filter(function(x) { return !!x; }).join(', ');
@@ -367,15 +363,14 @@
     subEl.textContent = loc;
     var divEl = document.createElement('div'); divEl.className = 'divider';
     var infoGrid = document.createElement('div'); infoGrid.className = 'info-grid';
-    infoGrid.appendChild(makeInfoItem('Age',       calcAge(p.dob)));
-    infoGrid.appendChild(makeInfoItem('Height',    p.height    || '-'));
-    infoGrid.appendChild(makeInfoItem('Education', trunc(p.education, 30)));
-    infoGrid.appendChild(makeInfoItem('Gotra',     p.gotra     || '-'));
+    infoGrid.appendChild(makeInfoItem('Age',        calcAge(p.dob)));
+    infoGrid.appendChild(makeInfoItem('Height',     p.height || '-'));
+    infoGrid.appendChild(makeInfoItem('Profession', trunc(p.occupation, 30)));
+    infoGrid.appendChild(makeInfoItem('Gotra',      p.gotra  || '-'));
     var tags = document.createElement('div'); tags.className = 'tags';
     var tagEl;
-    if (p.diet)     { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.diet;     tags.appendChild(tagEl); }
-    if (p.matha)    { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.matha;    tags.appendChild(tagEl); }
-    if (p.euStatus) { tagEl = document.createElement('span'); tagEl.className = 'tag highlight'; tagEl.textContent = p.euStatus; tags.appendChild(tagEl); }
+    if (p.euYears)  { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.euYears;  tags.appendChild(tagEl); }
+    if (p.city)     { tagEl = document.createElement('span'); tagEl.className = 'tag highlight'; tagEl.textContent = p.city;     tags.appendChild(tagEl); }
     body.appendChild(nameEl); body.appendChild(subEl); body.appendChild(divEl);
     body.appendChild(infoGrid); body.appendChild(tags);
     card.appendChild(body);
@@ -403,15 +398,18 @@
     subEl.textContent = (p.occupation || '') + (loc ? ' - ' + loc : '');
     bodyEl.appendChild(nameEl); bodyEl.appendChild(subEl);
     bodyEl.appendChild(makeSection('Personal Details', [
-      ['Age / DOB',          calcAge(p.dob) + ' / ' + (p.dob || '-')],
-      ['Height',             p.height],       ['Weight Range',  p.weightRange],
-      ['Body Type',          p.bodyType],      ['Complexion',    p.complexion],
-      ['Dietary Preference', p.diet],          ['Siblings',      p.siblings]
+      ['Age',        calcAge(p.dob)],
+      ['Height',     p.height],
+      ['Weight Range', p.weightRange],
+      ['Body Type',  p.bodyType],
+      ['Complexion', p.complexion],
+      ['Siblings',   p.siblings]
     ]));
-    bodyEl.appendChild(makeSection('Location & Career', [
-      ['Country', p.country], ['City', p.city],
-      ['EU Status', p.euStatus], ['Years in EU', p.euYears],
-      ['Education', p.education], ['Occupation', p.occupation]
+   bodyEl.appendChild(makeSection('Location & Career', [
+      ['Country',    p.country],
+      ['City',       p.city],
+      ['Years in EU', p.euYears],
+      ['Occupation', p.occupation]
     ]));
     bodyEl.appendChild(makeSection('Community & Religious Details', [
       ['Community', p.community], ['Gotra', p.gotra],
@@ -423,9 +421,10 @@
       ['Father', p.fatherInfo], ['Mother', p.motherInfo]
     ]));
     bodyEl.appendChild(makeSection('Partner Preferences', [
-      ['Preferred Location',   p.prefLocation],  ['Dietary Preference', p.prefDiet],
-      ['Horoscope Matching',   p.horoscopeReq],  ['Preferred Height',   p.prefHeightRange],
-      ['Education Preference', p.prefEducation], ['Career Preference',  p.prefCareer]
+      ['Preferred Location', p.prefLocation],
+      ['Horoscope Matching', p.horoscopeReq],
+      ['Preferred Height',   p.prefHeightRange],
+      ['Career Preference',  p.prefCareer]
     ]));
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
