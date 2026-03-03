@@ -292,12 +292,28 @@
       track.className = 'photo-track';
       var j, img;
       for (j = 0; j < photos.length; j++) {
-        img = document.createElement('img');
-        img.src     = photos[j];
-        img.alt     = (p.firstName || '');
-        img.loading = 'lazy';
-        img.onerror = function() { this.style.display = 'none'; };
-        track.appendChild(img);
+        var slide = document.createElement('div');
+        slide.className = 'photo-slide';
+      
+        var bgImg = document.createElement('img');
+        bgImg.src = photos[j];
+        bgImg.className = 'bg-blur';
+        bgImg.alt = '';
+        bgImg.setAttribute('aria-hidden', 'true');
+      
+        var fgImg = document.createElement('img');
+        fgImg.src = photos[j];
+        fgImg.className = 'fg-img';
+        fgImg.alt = (p.firstName || '');
+        fgImg.loading = 'lazy';
+        fgImg.onerror = function() {
+          this.parentNode.style.background = 'linear-gradient(135deg,#f5ede0,#ede0cc)';
+          this.style.display = 'none';
+        };
+      
+        slide.appendChild(bgImg);
+        slide.appendChild(fgImg);
+        track.appendChild(slide);
       }
       photoArea.appendChild(track);
 
