@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GSB Matrimonial</title>
+<title>Amgele Anubandha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -94,8 +94,8 @@
 
 <header>
   <div>
-    <div class="logo">GSB <span>Matrimonial</span></div>
-    <div class="header-sub">Gaud Saraswat Brahmin Community</div>
+    <div class="logo">Amgele <span>Anubandha</span></div>
+    <div class="header-sub">Amgele Anubandh (EU) - Saraswat Konkani Matrimonial Registry</div>
   </div>
 </header>
 
@@ -455,6 +455,14 @@
     sec.appendChild(grid); return sec;
   }
 
+  var regBtn = document.createElement('a');
+  regBtn.href = 'https://docs.google.com/forms/d/e/1FAIpQLSfECQUPLBq_W5qDUrnp0O8ayEVHp7BYnSzOaKevWUIfFzYh-w/viewform';
+  regBtn.target = '_blank';
+  regBtn.rel = 'noopener noreferrer';
+  regBtn.style.cssText = 'padding:8px 18px;background:var(--gold);color:var(--dark);border-radius:4px;font-size:.78rem;font-weight:500;text-decoration:none;letter-spacing:.05em;white-space:nowrap;';
+  regBtn.textContent = 'Register Profile';
+  document.querySelector('header').appendChild(regBtn);
+  
   loadProfiles();
 </script>
 </body>
