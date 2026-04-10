@@ -3,467 +3,776 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Amgele Anubandha</title>
+<title>Amgele Anubandha – GSB Matrimonial Europe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold:#c9a84c; --gold-light:#e8c97a; --cream:#fdf8f0; --dark:#1a1208;
-    --brown:#5c3d1e; --muted:#8a7560; --card-bg:#ffffff; --border:#e8dcc8; --tag-bg:#f5ede0;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;}
 
-  header{background:var(--dark);padding:24px 40px;display:flex;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--gold);}
-  .logo{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--gold-light);letter-spacing:.04em;}
-  .logo span{font-style:italic;color:#fff;}
-  .header-sub{font-size:.72rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:2px;}
+/* ═══════════════════════════════════════════════
+   SHARED TOKENS  (used by both landing + viewer)
+═══════════════════════════════════════════════ */
+:root {
+  --gold:#c9a84c; --gold-light:#e8c97a; --cream:#fdf8f0; --dark:#1a1208;
+  --brown:#5c3d1e; --muted:#8a7560; --card-bg:#ffffff; --border:#e8dcc8;
+  --tag-bg:#f5ede0; --crimson:#7a1c1c; --crimson-dark:#4e1010;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;}
 
-  .filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:14px 40px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-  .filter-bar label{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:4px;}
-  .filter-bar select,.filter-bar input{padding:6px 12px;border:1px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--dark);background:var(--cream);outline:none;cursor:pointer;transition:border-color .2s;}
-  .filter-bar select:focus,.filter-bar input:focus{border-color:var(--gold);}
-  .filter-group{display:flex;align-items:center;gap:6px;}
-  .count-badge{margin-left:auto;font-size:.78rem;color:var(--muted);}
+/* ═══════════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════════ */
+#landingPage { position:relative; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2.5rem 1.5rem 3rem; overflow:hidden; }
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:28px;padding:36px 40px;max-width:1400px;margin:0 auto;}
+/* Background – tries PNG, falls back to inline SVG mandala */
+#landingBgImg {
+  position:absolute; inset:0; z-index:0;
+  background-image: url('Gemini_Generated_Image_xv9y6kxv9y6kxv9y.png');
+  background-size:cover; background-position:center;
+  filter:saturate(0.65) brightness(0.86);
+}
+#landingBgImg::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(160deg, rgba(253,248,240,.62) 0%, rgba(253,248,240,.82) 100%);
+}
+#landingBgSvg { position:absolute; inset:0; z-index:0; display:none; overflow:hidden; }
+#landingBgSvg svg { width:100%; height:100%; }
 
-  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease;cursor:pointer;animation:fadeUp .4s ease both;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  .card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(90,60,10,.12);}
+.landing-content { position:relative; z-index:1; max-width:620px; }
 
-  .card-photos{position:relative;height:260px;background:#f0e8d8;overflow:hidden;}
-  .photo-track{display:flex;height:100%;transition:transform .4s ease;}
-  .photo-slide{position:relative;width:100%;height:100%;flex-shrink:0;overflow:hidden;}
-  .photo-slide .bg-blur{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;object-position:center;filter:blur(18px) brightness(0.85) saturate(1.2);transform:scale(1.1);image-orientation:from-image;}
-  .photo-slide .fg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;image-orientation:from-image;}
-  .photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);background:linear-gradient(135deg,#f5ede0 0%,#ede0cc 100%);font-size:3rem;}
-  .photo-placeholder p{font-size:.78rem;margin-top:8px;}
-  .photo-nav{position:absolute;bottom:10px;right:12px;display:flex;gap:6px;z-index:2;}
-  .photo-nav button{width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:var(--dark);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:background .2s;}
-  .photo-nav button:hover{background:#fff;}
-  .photo-dots{position:absolute;bottom:12px;left:12px;display:flex;gap:4px;}
-  .photo-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);transition:background .2s;}
-  .photo-dots span.active{background:#fff;}
-  .gender-badge{position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(6px);}
-  .gender-badge.male{background:rgba(30,90,180,.75);color:#fff;}
-  .gender-badge.female{background:rgba(180,30,90,.75);color:#fff;}
+/* Logo */
+.logo-wrap { margin-bottom:1.5rem; }
+#logoImg {
+  max-width:190px; max-height:150px; object-fit:contain;
+  display:block; margin:0 auto;
+  /* ── BASE64 PLACEHOLDER ──────────────────────────────────────────────────
+     To embed the logo directly instead of loading from file, replace the
+     src attribute value below with your base64 string:
+     src="data:image/png;base64,YOUR_BASE64_STRING_HERE"
+     You can generate this with:  base64 -i "Amgele Anubandha Logo.png"
+     ─────────────────────────────────────────────────────────────────────── */
+}
+#logoImg.hidden { display:none; }
+#logoFallback { display:none; flex-direction:column; align-items:center; gap:4px; }
 
-  .card-body{padding:20px 22px 22px;}
-  .card-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--dark);line-height:1.2;}
-  .card-sub{font-size:.78rem;color:var(--muted);margin-top:3px;}
-  .divider{height:1px;background:var(--border);margin:14px 0;}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
-  .info-item label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:1px;}
-  .info-item span{font-size:.82rem;color:var(--dark);font-weight:500;}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
-  .tag{background:var(--tag-bg);border:1px solid var(--border);color:var(--brown);font-size:.7rem;padding:3px 9px;border-radius:20px;letter-spacing:.04em;}
-  .tag.highlight{background:var(--gold);border-color:var(--gold);color:var(--dark);font-weight:500;}
+/* Wordmark (shown when no logo image) */
+.wordmark { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; color:var(--gold-light); letter-spacing:.04em; }
+.wordmark em { font-style:italic; color:var(--dark); }
 
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,5,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--card-bg);border-radius:16px;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;position:relative;animation:modalIn .3s ease;}
-  @keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-  .modal-close{position:sticky;top:0;display:flex;justify-content:flex-end;padding:14px 18px 0;background:var(--card-bg);z-index:1;}
-  .modal-close button{width:32px;height:32px;border:1px solid var(--border);background:var(--cream);border-radius:50%;cursor:pointer;font-size:1rem;color:var(--dark);display:flex;align-items:center;justify-content:center;}
-  .modal-photos{display:flex;gap:8px;overflow-x:auto;padding:10px 20px 6px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
-  .modal-photos img{height:200px;border-radius:8px;flex-shrink:0;scroll-snap-align:start;object-fit:cover;object-position:center top;image-orientation:from-image;}
-  .modal-body{padding:20px 26px 28px;}
-  .modal-name{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--dark);}
-  .modal-section{margin-top:20px;}
-  .modal-section h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;}
-  .modal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 20px;}
-  .modal-field label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;}
-  .modal-field span{font-size:.85rem;color:var(--dark);}
+/* Titles */
+h1.hero-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.1rem,6vw,3.5rem);
+  font-weight:600; color:var(--crimson-dark);
+  line-height:1.1; letter-spacing:.02em; margin-bottom:.3rem;
+}
+h1.hero-title em { font-style:italic; color:var(--gold); }
+.hero-sub {
+  font-size:.75rem; font-weight:300; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--brown); margin-bottom:1.2rem;
+}
+.ornament {
+  display:flex; align-items:center; justify-content:center;
+  gap:10px; margin:0 auto 1.4rem; width:240px; color:var(--gold);
+}
+.ornament::before,.ornament::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right,transparent,var(--gold-light));
+}
+.ornament::after { background:linear-gradient(to left,transparent,var(--gold-light)); }
+.hero-tagline {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(1rem,2.4vw,1.18rem);
+  color:var(--brown); margin-bottom:2.4rem; line-height:1.65;
+}
 
-  .state-msg{text-align:center;padding:80px 20px;color:var(--muted);grid-column:1/-1;}
-  .state-msg h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:8px;}
-  .state-msg p{font-size:.85rem;line-height:1.6;}
-  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px;}
-  @keyframes spin{to{transform:rotate(360deg)}}
+/* Buttons */
+.btn-row { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:2rem; }
+.btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:.72rem 1.8rem; border-radius:3px;
+  font-family:'DM Sans',sans-serif; font-size:.8rem;
+  font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+  cursor:pointer; border:none; text-decoration:none; transition:all .2s;
+}
+.btn-primary { background:var(--crimson); color:#fdf8f0; box-shadow:0 2px 10px rgba(122,28,28,.28); }
+.btn-primary:hover { background:var(--crimson-dark); transform:translateY(-1px); box-shadow:0 5px 18px rgba(122,28,28,.32); }
+.btn-outline { background:transparent; color:var(--crimson); border:1.5px solid var(--crimson); }
+.btn-outline:hover { background:var(--crimson); color:#fdf8f0; transform:translateY(-1px); }
 
-  @media(max-width:600px){
-    header{padding:16px 20px;}
-    .filter-bar{padding:12px 16px;gap:8px;}
-    .grid{padding:20px 16px;gap:20px;}
-    .count-badge{width:100%;}
-  }
+/* Footer policy links */
+.policy-links { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; }
+.policy-links a {
+  font-size:.73rem; font-weight:400; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted);
+  text-decoration:none; border-bottom:1px solid transparent; transition:all .18s;
+}
+.policy-links a:hover { color:var(--gold); border-bottom-color:var(--gold-light); }
+
+/* ═══════════════════════════════════════════════
+   PROFILES VIEWER  (identical to original)
+═══════════════════════════════════════════════ */
+#viewerPage { display:none; }
+
+#viewerPage header {
+  background:var(--dark); padding:24px 40px;
+  display:flex; align-items:center;
+  position:sticky; top:0; z-index:100;
+  border-bottom:1px solid var(--gold);
+}
+.logo { font-family:'Cormorant Garamond',serif; font-size:1.7rem; font-weight:300; color:var(--gold-light); letter-spacing:.04em; }
+.logo span { font-style:italic; color:#fff; }
+.header-sub { font-size:.72rem; color:var(--muted); letter-spacing:.15em; text-transform:uppercase; margin-top:2px; }
+
+.filter-bar { background:#fff; border-bottom:1px solid var(--border); padding:14px 40px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+.filter-bar label { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-right:4px; }
+.filter-bar select,.filter-bar input { padding:6px 12px; border:1px solid var(--border); border-radius:4px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--dark); background:var(--cream); outline:none; cursor:pointer; transition:border-color .2s; }
+.filter-bar select:focus,.filter-bar input:focus { border-color:var(--gold); }
+.filter-group { display:flex; align-items:center; gap:6px; }
+.count-badge { margin-left:auto; font-size:.78rem; color:var(--muted); }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:28px; padding:36px 40px; max-width:1400px; margin:0 auto; }
+
+.card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:transform .25s ease,box-shadow .25s ease; cursor:pointer; animation:fadeUp .4s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(90,60,10,.12); }
+
+.card-photos { position:relative; height:260px; background:#f0e8d8; overflow:hidden; }
+.photo-track { display:flex; height:100%; transition:transform .4s ease; }
+.photo-slide { position:relative; width:100%; height:100%; flex-shrink:0; overflow:hidden; }
+.photo-slide .bg-blur { position:absolute; inset:-20px; width:calc(100% + 40px); height:calc(100% + 40px); object-fit:cover; object-position:center; filter:blur(18px) brightness(0.85) saturate(1.2); transform:scale(1.1); image-orientation:from-image; }
+.photo-slide .fg-img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center; image-orientation:from-image; }
+.photo-placeholder { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); background:linear-gradient(135deg,#f5ede0 0%,#ede0cc 100%); font-size:3rem; }
+.photo-placeholder p { font-size:.78rem; margin-top:8px; }
+.photo-nav { position:absolute; bottom:10px; right:12px; display:flex; gap:6px; z-index:2; }
+.photo-nav button { width:28px; height:28px; border-radius:50%; border:none; background:rgba(255,255,255,.85); color:var(--dark); font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); transition:background .2s; }
+.photo-nav button:hover { background:#fff; }
+.photo-dots { position:absolute; bottom:12px; left:12px; display:flex; gap:4px; }
+.photo-dots span { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.5); transition:background .2s; }
+.photo-dots span.active { background:#fff; }
+.gender-badge { position:absolute; top:12px; right:12px; padding:3px 10px; border-radius:20px; font-size:.68rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase; backdrop-filter:blur(6px); }
+.gender-badge.male { background:rgba(30,90,180,.75); color:#fff; }
+.gender-badge.female { background:rgba(180,30,90,.75); color:#fff; }
+
+.card-body { padding:20px 22px 22px; }
+.card-name { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:600; color:var(--dark); line-height:1.2; }
+.card-sub { font-size:.78rem; color:var(--muted); margin-top:3px; }
+.divider { height:1px; background:var(--border); margin:14px 0; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
+.info-item label { display:block; font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:1px; }
+.info-item span { font-size:.82rem; color:var(--dark); font-weight:500; }
+.tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.tag { background:var(--tag-bg); border:1px solid var(--border); color:var(--brown); font-size:.7rem; padding:3px 9px; border-radius:20px; letter-spacing:.04em; }
+.tag.highlight { background:var(--gold); border-color:var(--gold); color:var(--dark); font-weight:500; }
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,5,0,.75); z-index:200; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--card-bg); border-radius:16px; max-width:720px; width:100%; max-height:90vh; overflow-y:auto; position:relative; animation:modalIn .3s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+.modal-close { position:sticky; top:0; display:flex; justify-content:flex-end; padding:14px 18px 0; background:var(--card-bg); z-index:1; }
+.modal-close button { width:32px; height:32px; border:1px solid var(--border); background:var(--cream); border-radius:50%; cursor:pointer; font-size:1rem; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+.modal-photos { display:flex; gap:8px; overflow-x:auto; padding:10px 20px 6px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+.modal-photos img { height:200px; border-radius:8px; flex-shrink:0; scroll-snap-align:start; object-fit:cover; object-position:center top; image-orientation:from-image; }
+.modal-body { padding:20px 26px 28px; }
+.modal-name { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:var(--dark); }
+.modal-section { margin-top:20px; }
+.modal-section h3 { font-size:.68rem; text-transform:uppercase; letter-spacing:.15em; color:var(--gold); margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+.modal-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px 20px; }
+.modal-field label { display:block; font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:2px; }
+.modal-field span { font-size:.85rem; color:var(--dark); }
+
+.state-msg { text-align:center; padding:80px 20px; color:var(--muted); grid-column:1/-1; }
+.state-msg h2 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; margin-bottom:8px; }
+.state-msg p { font-size:.85rem; line-height:1.6; }
+.spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 16px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ═══════════════════════════════════════════════
+   POLICY MODALS (Terms & Privacy)
+═══════════════════════════════════════════════ */
+.policy-overlay {
+  display:none; position:fixed; inset:0; z-index:300;
+  background:rgba(26,18,8,.72); align-items:center; justify-content:center;
+  padding:1rem; backdrop-filter:blur(3px);
+}
+.policy-overlay.open { display:flex; }
+.policy-box {
+  background:var(--cream); border:1px solid var(--gold-light);
+  border-radius:6px; max-width:660px; width:100%;
+  max-height:84vh; overflow-y:auto; position:relative;
+  padding:2.2rem 2rem; animation:modalIn .25s ease;
+}
+.policy-box-close {
+  position:absolute; top:1rem; right:1.2rem;
+  background:none; border:none; font-size:1.4rem;
+  cursor:pointer; color:var(--muted); line-height:1;
+}
+.policy-box-close:hover { color:var(--crimson); }
+.policy-box h2 {
+  font-family:'Cormorant Garamond',serif; font-size:1.65rem;
+  font-weight:600; color:var(--crimson-dark); margin-bottom:.2rem;
+}
+.policy-hr { height:2px; background:linear-gradient(to right,var(--gold-light),transparent); border:none; margin:.8rem 0 1.4rem; }
+.policy-body { font-size:.86rem; line-height:1.78; color:var(--brown); }
+.policy-body h3 {
+  font-family:'Cormorant Garamond',serif; font-size:1.05rem;
+  font-weight:600; color:var(--dark); margin:1.3rem 0 .35rem;
+}
+.policy-body ul { list-style:none; padding-left:.7rem; }
+.policy-body ul li { position:relative; padding-left:1.1rem; margin-bottom:.4rem; }
+.policy-body ul li::before { content:'›'; position:absolute; left:0; color:var(--gold); line-height:1.78; }
+.policy-body p { margin-bottom:.5rem; }
+
+@media(max-width:600px) {
+  #viewerPage header { padding:16px 20px; }
+  .filter-bar { padding:12px 16px; gap:8px; }
+  .grid { padding:20px 16px; gap:20px; }
+  .count-badge { width:100%; }
+  .btn { padding:.62rem 1.2rem; font-size:.74rem; }
+  .policy-box { padding:1.6rem 1.2rem; }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <div class="logo">Amgele <span>Anubandha</span></div>
-    <div class="header-sub">Amgele Anubandh (EU) - Saraswat Konkani Matrimonial Registry</div>
-  </div>
-</header>
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
+<section id="landingPage">
 
-<div class="filter-bar">
-  <div class="filter-group"><label>Gender</label>
-    <select id="filterGender" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
+  <!-- Background: PNG first, SVG mandala fallback -->
+  <div id="landingBgImg"></div>
+  <div id="landingBgSvg">
+    <svg viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="900" fill="#fdf8f0"/>
+      <g transform="translate(600,450)" opacity="0.11" fill="none" stroke="#c9a84c">
+        <circle r="390" stroke-width="0.8"/><circle r="310" stroke-width="0.5"/>
+        <circle r="230" stroke-width="0.8"/><circle r="155" stroke-width="0.5"/>
+        <circle r="80"  stroke-width="0.8"/>
+        <g>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(30)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(60)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(90)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(120)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(150)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(180)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(210)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(240)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(270)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(300)"/>
+          <path d="M0-390 C45-320 45-250 0-180 C-45-250 -45-320 0-390" fill="#c9a84c" opacity="0.55" transform="rotate(330)"/>
+        </g>
+        <g>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(0)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(45)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(90)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(135)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(180)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(225)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(270)"/>
+          <path d="M0-180 C22-145 22-110 0-75 C-22-110 -22-145 0-180" fill="#7a1c1c" opacity="0.45" transform="rotate(315)"/>
+        </g>
+        <line x1="0" y1="-390" x2="0" y2="390" stroke-width="0.4" opacity="0.5"/>
+        <line x1="-390" y1="0" x2="390" y2="0" stroke-width="0.4" opacity="0.5"/>
+        <line x1="-276" y1="-276" x2="276" y2="276" stroke-width="0.4" opacity="0.5"/>
+        <line x1="276" y1="-276" x2="-276" y2="276" stroke-width="0.4" opacity="0.5"/>
+        <circle r="46" fill="#c9a84c" opacity="0.25"/><circle r="18" fill="#7a1c1c" opacity="0.45"/>
+      </g>
+      <g opacity="0.07" fill="#c9a84c">
+        <path d="M0 0 L120 0 L0 120 Z"/><path d="M1200 0 L1080 0 L1200 120 Z"/>
+        <path d="M0 900 L120 900 L0 780 Z"/><path d="M1200 900 L1080 900 L1200 780 Z"/>
+      </g>
+    </svg>
   </div>
-  <div class="filter-group"><label>Country</label>
-    <select id="filterCountry" onchange="applyFilters()"><option value="">All</option></select>
+
+  <div class="landing-content">
+
+    <!-- LOGO -->
+    <!-- Place "Amgele Anubandha Logo.png" in the same folder as this HTML file -->
+    <!-- OR replace the src below with a data:image/png;base64,... string       -->
+    <div class="logo-wrap">
+      <img id="logoImg"
+           src="Amgele Anubandha Logo.png"
+           alt="Amgele Anubandha Logo"
+           onerror="this.classList.add('hidden');document.getElementById('logoFallback').style.display='flex';">
+      <div id="logoFallback">
+        <svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <circle cx="45" cy="45" r="43" stroke="#c9a84c" stroke-width="1" opacity="0.45"/>
+          <circle cx="45" cy="45" r="34" stroke="#7a1c1c" stroke-width=".7" opacity="0.3"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.7"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(45,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(90,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(135,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(180,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(225,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(270,45,45)"/>
+          <ellipse cx="45" cy="27" rx="6" ry="14" fill="#7a1c1c" opacity="0.6" transform="rotate(315,45,45)"/>
+          <circle cx="45" cy="45" r="10" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="45" cy="45" r="5.5" fill="#fdf8f0"/>
+          <circle cx="45" cy="45" r="3" fill="#7a1c1c" opacity="0.8"/>
+        </svg>
+        <div class="wordmark">Amgele <em>Anubandha</em></div>
+      </div>
+    </div>
+
+    <h1 class="hero-title">Amgele<em> Anubandha</em></h1>
+    <p class="hero-sub">Hindu Konkani Saraswat · Europe</p>
+
+    <div class="ornament">✦</div>
+
+    <p class="hero-tagline">
+      A trusted space for the GSB community in Europe<br>
+      to discover meaningful, lasting connections.
+    </p>
+
+    <div class="btn-row">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfECQUPLBq_W5qDUrnp0O8ayEVHp7BYnSzOaKevWUIfFzYh-w/viewform"
+         target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        ✦&nbsp; Register Profile
+      </a>
+      <button class="btn btn-outline" onclick="showViewer()">
+        View Profiles
+      </button>
+    </div>
+
+    <div class="policy-links">
+      <a href="#" onclick="openPolicy('termsOverlay');return false;">Terms &amp; Conditions</a>
+      <a href="#" onclick="openPolicy('privacyOverlay');return false;">Data Privacy (GDPR)</a>
+    </div>
+
   </div>
-  <div class="filter-group"><label>Diet</label>
-    <select id="filterDiet" onchange="applyFilters()"><option value="">All</option></select>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PROFILES VIEWER  (original code, untouched)
+══════════════════════════════════════════ -->
+<div id="viewerPage">
+
+  <header>
+    <div>
+      <div class="logo">Amgele <span>Anubandha</span></div>
+      <div class="header-sub">Amgele Anubandh (EU) – Saraswat Konkani Matrimonial Registry</div>
+    </div>
+    <button onclick="showLanding()" style="margin-left:auto;padding:8px 18px;background:transparent;color:var(--gold-light);border:1px solid var(--gold);border-radius:4px;font-size:.78rem;font-weight:500;letter-spacing:.05em;cursor:pointer;white-space:nowrap;">← Home</button>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-group"><label>Gender</label>
+      <select id="filterGender" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+    <div class="filter-group"><label>Country</label>
+      <select id="filterCountry" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group"><label>Diet</label>
+      <select id="filterDiet" onchange="applyFilters()"><option value="">All</option></select>
+    </div>
+    <div class="filter-group"><label>Search</label>
+      <input type="text" id="searchInput" placeholder="Name, city, occupation..." oninput="applyFilters()" style="width:200px">
+    </div>
+    <div class="count-badge" id="countBadge"></div>
   </div>
-  <div class="filter-group"><label>Search</label>
-    <input type="text" id="searchInput" placeholder="Name, city, occupation..." oninput="applyFilters()" style="width:200px">
+
+  <div class="grid" id="profileGrid">
+    <div class="state-msg"><div class="spinner"></div><h2>Loading profiles...</h2></div>
   </div>
-  <div class="count-badge" id="countBadge"></div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-close"><button onclick="closeModalDirect()">✕</button></div>
+      <div class="modal-photos" id="modalPhotos"></div>
+      <div class="modal-body"  id="modalBody"></div>
+    </div>
+  </div>
+
 </div>
 
-<div class="grid" id="profileGrid">
-  <div class="state-msg"><div class="spinner"></div><h2>Loading profiles...</h2></div>
-</div>
 
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" id="modal">
-    <div class="modal-close"><button onclick="closeModalDirect()">X</button></div>
-    <div class="modal-photos" id="modalPhotos"></div>
-    <div class="modal-body"  id="modalBody"></div>
+<!-- ══════════════════════════════════════════
+     TERMS & CONDITIONS MODAL
+══════════════════════════════════════════ -->
+<div class="policy-overlay" id="termsOverlay">
+  <div class="policy-box">
+    <button class="policy-box-close" onclick="closePolicy('termsOverlay')">×</button>
+    <h2>Terms &amp; Conditions</h2>
+    <hr class="policy-hr">
+    <div class="policy-body">
+
+      <h3>1. Scope of Service</h3>
+      <p>Amgele Anubandh Europe (hereafter referred to as "the Team") acts solely as a facilitator to help members of the Hindu Konkani Saraswat community in Europe identify potential matrimonial matches.</p>
+      <ul>
+        <li><strong>Facilitation Only:</strong> Our role is limited to providing a platform for discovery and facilitating initial connections.</li>
+        <li><strong>No Mediation:</strong> The Team is not responsible for taking the alliance forward, mediating discussions, or organizing family meetings. All further steps are the sole responsibility of the candidates and their respective families.</li>
+      </ul>
+
+      <h3>2. Accuracy &amp; Verification Disclaimer</h3>
+      <ul>
+        <li><strong>Trust Basis:</strong> The Team operates entirely on a Good Faith/Trust Basis.</li>
+        <li><strong>No Vetting:</strong> We do not independently verify the accuracy of the data provided (including education, occupation, or residency status) nor do we vouch for the character, background, or medical history of any candidate.</li>
+        <li><strong>Due Diligence:</strong> Candidates and their families are strictly advised to perform their own independent background checks and due diligence before finalising any alliance.</li>
+      </ul>
+
+      <h3>3. Data Privacy &amp; Responsible Usage (GDPR)</h3>
+      <p>In accordance with EU GDPR guidelines, by accessing information about other candidates, you agree to:</p>
+      <ul>
+        <li><strong>Purpose Limitation:</strong> Use the shared data only for the intended purpose of matrimonial inquiry.</li>
+        <li><strong>Confidentiality:</strong> You shall not share, screenshot, or distribute another candidate's profile, photos, or contact details to any third party or social media platform without explicit consent.</li>
+        <li><strong>Data Security:</strong> Any information received must be stored securely and deleted if you decide not to pursue a match.</li>
+      </ul>
+
+      <h3>4. Mandatory Reporting &amp; Updates</h3>
+      <p>To maintain the integrity of our database and respect the time of other participants, you agree to:</p>
+      <ul>
+        <li><strong>Marriage Fixation:</strong> Inform the Team immediately if your marriage is fixed (whether through this platform or elsewhere) so that your profile can be ruled out from future matches.</li>
+        <li><strong>Periodic Updates:</strong> The Team appreciates periodic updates regarding ongoing communications, lack of interest, or the discontinuation of talks with a suggested profile. This helps us refine your future matches.</li>
+      </ul>
+
+      <h3>5. Limitation of Liability</h3>
+      <p>The Team shall not be held liable for any emotional distress, financial loss, or disputes arising from interactions, fraudulent information, or the eventual outcome of a match.</p>
+
+    </div>
   </div>
 </div>
+
+
+<!-- ══════════════════════════════════════════
+     DATA PRIVACY (GDPR) MODAL
+══════════════════════════════════════════ -->
+<div class="policy-overlay" id="privacyOverlay">
+  <div class="policy-box">
+    <button class="policy-box-close" onclick="closePolicy('privacyOverlay')">×</button>
+    <h2>Data Privacy &amp; GDPR Declaration</h2>
+    <hr class="policy-hr">
+    <div class="policy-body">
+
+      <p>By proceeding with this registration, you acknowledge and agree to the following:</p>
+
+      <h3>1. Purpose of Collection</h3>
+      <p>The information provided is strictly for matrimonial purposes. Your data will be used to facilitate introductions within the Hindu Konkani community.</p>
+
+      <h3>2. Sensitive Personal Data</h3>
+      <p>Under EU GDPR, information regarding religion and ancestry (Gotra/Kuladevata) is considered "Special Category Data." By filling out this form, you provide explicit consent for us to process this information.</p>
+
+      <h3>3. Responsible Use of AI (Google Gemini)</h3>
+      <p>We utilize AI technology (Google Gemini) as a productivity and analysis tool to assist our administrators in efficiently organising data and identifying potential candidate matches based on the preferences you provide.</p>
+      <ul>
+        <li><strong>Human-in-the-Loop:</strong> AI is used only to suggest potential matches; all final match-making reviews and communications are conducted by human administrators. No significant decisions are made through purely automated processing.</li>
+        <li><strong>Data Security:</strong> Your data is processed within secure, private Google environments and is not used to train public or foundational AI models.</li>
+      </ul>
+
+      <h3>4. Data Sharing</h3>
+      <p>Your profile details (excluding private contact information) will be shared with other registered participants and their families. Your mobile number and email will only be shared when there is mutual interest.</p>
+
+      <h3>5. Storage &amp; Security</h3>
+      <p>We use Google's secure infrastructure to store this data. Access is limited to the administrative team.</p>
+
+      <h3>6. Right to Deletion</h3>
+      <p>You have the right to withdraw your consent at any time. If you wish to have your profile removed from the registry, please contact the administrator, and your data will be permanently deleted within 7 days.</p>
+
+      <h3>7. Verification</h3>
+      <p>While we facilitate the connection, the responsibility for background verification and due diligence lies solely with the individuals and their families.</p>
+
+    </div>
+  </div>
+</div>
+
 
 <script>
-  // ── PASTE YOUR APPS SCRIPT WEB APP URL HERE ───────────────
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytLCxeEI40Gmf18ZUPC0XeSuwkktDoWJ1Cl9fffqAXiwC_HAkEZVZaFCP6Rb6TdEY_/exec";
-  // ─────────────────────────────────────────────────────────
+/* ── PAGE SWITCHING ──────────────────────────────── */
+var viewerLoaded = false;
+function showViewer() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('viewerPage').style.display  = 'block';
+  document.body.style.overflow = '';
+  if (!viewerLoaded) { loadProfiles(); viewerLoaded = true; }
+}
+function showLanding() {
+  document.getElementById('viewerPage').style.display  = 'none';
+  document.getElementById('landingPage').style.display = 'flex';
+}
 
-  var ALL_PROFILES     = [];
-  var filteredProfiles = [];
+/* ── BACKGROUND FALLBACK ─────────────────────────── */
+(function(){
+  var img = new Image();
+  img.src = 'Gemini_Generated_Image_xv9y6kxv9y6kxv9y.png';
+  img.onerror = function(){
+    document.getElementById('landingBgImg').style.display = 'none';
+    document.getElementById('landingBgSvg').style.display = 'block';
+  };
+})();
 
-  function extractFileId(url) {
-    if (!url) return null;
-    var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (m) return m[1];
-    m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (m) return m[1];
-    return null;
+/* ── POLICY MODALS ───────────────────────────────── */
+function openPolicy(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePolicy(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.policy-overlay').forEach(function(el){
+  el.addEventListener('click', function(e){ if(e.target===el) closePolicy(el.id); });
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    document.querySelectorAll('.policy-overlay.open').forEach(function(m){ closePolicy(m.id); });
+    closeModalDirect();
   }
+});
 
-  function driveToImg(url) {
-    if (!url || !url.trim()) return null;
-    url = url.trim();
-    if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) return url;
-    var fileId = extractFileId(url);
-    if (!fileId) return null;
-    return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w600';
+/* ═════════════════════════════════════════════════
+   PROFILES VIEWER — original logic, unchanged
+═════════════════════════════════════════════════ */
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbytLCxeEI40Gmf18ZUPC0XeSuwkktDoWJ1Cl9fffqAXiwC_HAkEZVZaFCP6Rb6TdEY_/exec";
+
+var ALL_PROFILES     = [];
+var filteredProfiles = [];
+
+function extractFileId(url) {
+  if (!url) return null;
+  var m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  return null;
+}
+function driveToImg(url) {
+  if (!url || !url.trim()) return null;
+  url = url.trim();
+  if (/\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)) return url;
+  var fileId = extractFileId(url);
+  if (!fileId) return null;
+  return 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w600';
+}
+function parsePhotos(raw) {
+  if (!raw) return [];
+  var parts  = raw.split(',');
+  var result = [];
+  for (var i = 0; i < parts.length; i++) {
+    var converted = driveToImg(parts[i]);
+    if (converted) result.push(converted);
   }
+  return result;
+}
+function calcAge(dob) {
+  if (!dob) return '-';
+  var d;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
+    var pts = dob.split('/');
+    d = new Date(pts[2] + '-' + pts[1] + '-' + pts[0]);
+  } else { d = new Date(dob); }
+  if (isNaN(d.getTime())) return '-';
+  var age = Math.floor((Date.now() - d) / (365.25 * 24 * 3600 * 1000));
+  return (age > 0 && age < 100) ? age + ' yrs' : '-';
+}
 
-  function parsePhotos(raw) {
-    if (!raw) return [];
-    var parts  = raw.split(',');
-    var result = [];
-    for (var i = 0; i < parts.length; i++) {
-      var converted = driveToImg(parts[i]);
-      if (converted) result.push(converted);
+function loadProfiles() {
+  fetch(WEB_APP_URL)
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error);
+      ALL_PROFILES = data;
+      populateFilters();
+      applyFilters();
+    })
+    .catch(function(err) {
+      showError('Could not load profiles: ' + err.message +
+        '<br><br>Make sure the Web App is deployed with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>.');
+    });
+}
+function showError(msg) {
+  document.getElementById('profileGrid').innerHTML =
+    '<div class="state-msg"><h2>Error</h2><p>' + msg + '</p></div>';
+  document.getElementById('countBadge').textContent = '';
+}
+function populateFilters() {
+  var countries=[], diets=[], seenC={}, seenD={}, i, p, opt;
+  for (i = 0; i < ALL_PROFILES.length; i++) {
+    p = ALL_PROFILES[i];
+    if (p.country && !seenC[p.country]) { countries.push(p.country); seenC[p.country]=true; }
+    if (p.diet    && !seenD[p.diet])    { diets.push(p.diet);        seenD[p.diet]=true; }
+  }
+  countries.sort(); diets.sort();
+  var cSel = document.getElementById('filterCountry');
+  var dSel = document.getElementById('filterDiet');
+  cSel.innerHTML = '<option value="">All</option>';
+  dSel.innerHTML = '<option value="">All</option>';
+  for (i = 0; i < countries.length; i++) {
+    opt = document.createElement('option'); opt.value=countries[i]; opt.textContent=countries[i]; cSel.appendChild(opt);
+  }
+  for (i = 0; i < diets.length; i++) {
+    opt = document.createElement('option'); opt.value=diets[i]; opt.textContent=diets[i]; dSel.appendChild(opt);
+  }
+}
+function applyFilters() {
+  var gender  = document.getElementById('filterGender').value;
+  var country = document.getElementById('filterCountry').value;
+  var diet    = document.getElementById('filterDiet').value;
+  var search  = document.getElementById('searchInput').value.toLowerCase();
+  filteredProfiles = [];
+  for (var i = 0; i < ALL_PROFILES.length; i++) {
+    var p = ALL_PROFILES[i];
+    if (gender  && p.gender  !== gender)  continue;
+    if (country && p.country !== country) continue;
+    if (diet    && p.diet    !== diet)    continue;
+    if (search) {
+      var hay = ((p.firstName||'') + ' ' + (p.lastName||'') + ' ' + (p.city||'') + ' ' +
+                 (p.country||'') + ' ' + (p.occupation||'') + ' ' + (p.education||'')).toLowerCase();
+      if (hay.indexOf(search) === -1) continue;
     }
-    return result;
+    filteredProfiles.push(p);
   }
-
-  function calcAge(dob) {
-    if (!dob) return '-';
-    var d;
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
-      var pts = dob.split('/');
-      d = new Date(pts[2] + '-' + pts[1] + '-' + pts[0]);
-    } else {
-      d = new Date(dob);
+  renderGrid();
+}
+function renderGrid() {
+  var grid  = document.getElementById('profileGrid');
+  var count = filteredProfiles.length;
+  document.getElementById('countBadge').textContent = count + ' profile' + (count !== 1 ? 's' : '');
+  grid.innerHTML = '';
+  if (count === 0) { grid.innerHTML = '<div class="state-msg"><h2>No profiles match your filters</h2></div>'; return; }
+  for (var i = 0; i < filteredProfiles.length; i++) grid.appendChild(createCard(filteredProfiles[i], i));
+}
+function trunc(s, n) {
+  if (!s) return '-';
+  return s.length > n ? s.substring(0, n) + '...' : s;
+}
+function createCard(p, idx) {
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.style.animationDelay = Math.min(idx * 60, 400) + 'ms';
+  var photoArea = document.createElement('div'); photoArea.className = 'card-photos';
+  var photos = parsePhotos(p.photos);
+  if (photos.length > 0) {
+    var track = document.createElement('div'); track.className = 'photo-track';
+    var j;
+    for (j = 0; j < photos.length; j++) {
+      var slide = document.createElement('div'); slide.className = 'photo-slide';
+      var bgImg = document.createElement('img'); bgImg.src=photos[j]; bgImg.className='bg-blur'; bgImg.alt=''; bgImg.setAttribute('aria-hidden','true');
+      var fgImg = document.createElement('img'); fgImg.src=photos[j]; fgImg.className='fg-img'; fgImg.alt=(p.firstName||''); fgImg.loading='lazy';
+      fgImg.onerror = function(){ this.parentNode.style.background='linear-gradient(135deg,#f5ede0,#ede0cc)'; this.style.display='none'; };
+      slide.appendChild(bgImg); slide.appendChild(fgImg); track.appendChild(slide);
     }
-    if (isNaN(d.getTime())) return '-';
-    var age = Math.floor((Date.now() - d) / (365.25 * 24 * 3600 * 1000));
-    return (age > 0 && age < 100) ? age + ' yrs' : '-';
-  }
-
-  function loadProfiles() {
-    if (!WEB_APP_URL || WEB_APP_URL === 'YOUR_WEB_APP_URL') {
-      showError('Please paste your Apps Script Web App URL into the WEB_APP_URL variable in this file.');
-      return;
-    }
-    fetch(WEB_APP_URL)
-      .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function(data) {
-        if (data.error) throw new Error(data.error);
-        ALL_PROFILES = data;
-        populateFilters();
-        applyFilters();
-      })
-      .catch(function(err) {
-        showError('Could not load profiles: ' + err.message +
-          '<br><br>Make sure the Web App is deployed with <strong>Execute as: Me</strong> and <strong>Who has access: Anyone</strong>.');
-      });
-  }
-
-  function showError(msg) {
-    document.getElementById('profileGrid').innerHTML =
-      '<div class="state-msg"><h2>Error</h2><p>' + msg + '</p></div>';
-    document.getElementById('countBadge').textContent = '';
-  }
-
-  function populateFilters() {
-    var countries = [];
-    var diets     = [];
-    var seenC     = {};
-    var seenD     = {};
-    var i, p, opt;
-    for (i = 0; i < ALL_PROFILES.length; i++) {
-      p = ALL_PROFILES[i];
-      if (p.country && !seenC[p.country]) { countries.push(p.country); seenC[p.country] = true; }
-      if (p.diet    && !seenD[p.diet])    { diets.push(p.diet);        seenD[p.diet]    = true; }
-    }
-    countries.sort(); diets.sort();
-    var cSel = document.getElementById('filterCountry');
-    var dSel = document.getElementById('filterDiet');
-    cSel.innerHTML = '<option value="">All</option>';
-    dSel.innerHTML = '<option value="">All</option>';
-    for (i = 0; i < countries.length; i++) {
-      opt = document.createElement('option');
-      opt.value = countries[i]; opt.textContent = countries[i];
-      cSel.appendChild(opt);
-    }
-    for (i = 0; i < diets.length; i++) {
-      opt = document.createElement('option');
-      opt.value = diets[i]; opt.textContent = diets[i];
-      dSel.appendChild(opt);
-    }
-  }
-
-  function applyFilters() {
-    var gender  = document.getElementById('filterGender').value;
-    var country = document.getElementById('filterCountry').value;
-    var diet    = document.getElementById('filterDiet').value;
-    var search  = document.getElementById('searchInput').value.toLowerCase();
-    filteredProfiles = [];
-    for (var i = 0; i < ALL_PROFILES.length; i++) {
-      var p = ALL_PROFILES[i];
-      if (gender  && p.gender  !== gender)  continue;
-      if (country && p.country !== country) continue;
-      if (diet    && p.diet    !== diet)    continue;
-      if (search) {
-        var hay = ((p.firstName||'') + ' ' + (p.lastName||'') + ' ' + (p.city||'') + ' ' +
-                   (p.country||'') + ' ' + (p.occupation||'') + ' ' + (p.education||'')).toLowerCase();
-        if (hay.indexOf(search) === -1) continue;
-      }
-      filteredProfiles.push(p);
-    }
-    renderGrid();
-  }
-
-  function renderGrid() {
-    var grid  = document.getElementById('profileGrid');
-    var count = filteredProfiles.length;
-    document.getElementById('countBadge').textContent = count + ' profile' + (count !== 1 ? 's' : '');
-    grid.innerHTML = '';
-    if (count === 0) {
-      grid.innerHTML = '<div class="state-msg"><h2>No profiles match your filters</h2></div>';
-      return;
-    }
-    for (var i = 0; i < filteredProfiles.length; i++) {
-      grid.appendChild(createCard(filteredProfiles[i], i));
-    }
-  }
-
-  function trunc(s, n) {
-    if (!s) return '-';
-    return s.length > n ? s.substring(0, n) + '...' : s;
-  }
-
-  function createCard(p, idx) {
-    var card = document.createElement('div');
-    card.className = 'card';
-    card.style.animationDelay = Math.min(idx * 60, 400) + 'ms';
-
-    var photoArea = document.createElement('div');
-    photoArea.className = 'card-photos';
-    var photos = parsePhotos(p.photos);
-
-    if (photos.length > 0) {
-      var track = document.createElement('div');
-      track.className = 'photo-track';
-      var j, img;
+    photoArea.appendChild(track);
+    if (photos.length > 1) {
+      var dots = document.createElement('div'); dots.className = 'photo-dots';
       for (j = 0; j < photos.length; j++) {
-        var slide = document.createElement('div');
-        slide.className = 'photo-slide';
-      
-        var bgImg = document.createElement('img');
-        bgImg.src = photos[j];
-        bgImg.className = 'bg-blur';
-        bgImg.alt = '';
-        bgImg.setAttribute('aria-hidden', 'true');
-      
-        var fgImg = document.createElement('img');
-        fgImg.src = photos[j];
-        fgImg.className = 'fg-img';
-        fgImg.alt = (p.firstName || '');
-        fgImg.loading = 'lazy';
-        fgImg.onerror = function() {
-          this.parentNode.style.background = 'linear-gradient(135deg,#f5ede0,#ede0cc)';
-          this.style.display = 'none';
-        };
-      
-        slide.appendChild(bgImg);
-        slide.appendChild(fgImg);
-        track.appendChild(slide);
+        var dot = document.createElement('span'); if (j===0) dot.className='active'; dots.appendChild(dot);
       }
-      photoArea.appendChild(track);
-
-      if (photos.length > 1) {
-        var dots = document.createElement('div');
-        dots.className = 'photo-dots';
-        for (j = 0; j < photos.length; j++) {
-          var dot = document.createElement('span');
-          if (j === 0) dot.className = 'active';
-          dots.appendChild(dot);
+      photoArea.appendChild(dots);
+      var nav  = document.createElement('div'); nav.className = 'photo-nav';
+      var prev = document.createElement('button'); prev.textContent = '‹';
+      var next = document.createElement('button'); next.textContent = '›';
+      nav.appendChild(prev); nav.appendChild(next); photoArea.appendChild(nav);
+      (function(tr, dt, total) {
+        var cur = 0;
+        function update() {
+          tr.style.transform = 'translateX(-' + (cur * 100) + '%)';
+          var allDots = dt.querySelectorAll('span');
+          for (var k = 0; k < allDots.length; k++) allDots[k].className = k===cur ? 'active' : '';
         }
-        photoArea.appendChild(dots);
-
-        var nav  = document.createElement('div'); nav.className = 'photo-nav';
-        var prev = document.createElement('button'); prev.textContent = '<';
-        var next = document.createElement('button'); next.textContent = '>';
-        nav.appendChild(prev); nav.appendChild(next);
-        photoArea.appendChild(nav);
-
-        (function(tr, dt, total) {
-          var cur = 0;
-          function update() {
-            tr.style.transform = 'translateX(-' + (cur * 100) + '%)';
-            var allDots = dt.querySelectorAll('span');
-            for (var k = 0; k < allDots.length; k++) {
-              allDots[k].className = k === cur ? 'active' : '';
-            }
-          }
-          prev.onclick = function(e) { e.stopPropagation(); cur = (cur - 1 + total) % total; update(); };
-          next.onclick = function(e) { e.stopPropagation(); cur = (cur + 1) % total; update(); };
-        })(track, dots, photos.length);
-      }
-    } else {
-      var ph = document.createElement('div');
-      ph.className = 'photo-placeholder';
-      ph.innerHTML = (p.gender === 'Female' ? '&#128105;' : '&#128104;') + '<p>Photo not uploaded</p>';
-      photoArea.appendChild(ph);
+        prev.onclick = function(e){ e.stopPropagation(); cur=(cur-1+total)%total; update(); };
+        next.onclick = function(e){ e.stopPropagation(); cur=(cur+1)%total; update(); };
+      })(track, dots, photos.length);
     }
-
-    card.appendChild(photoArea);
-
-    var loc  = [p.city, p.country].filter(function(x) { return !!x; }).join(', ');
-    var body = document.createElement('div'); body.className = 'card-body';
-    var nameEl = document.createElement('div'); nameEl.className = 'card-name';
-    nameEl.textContent = (p.firstName || '') + ' ' + (p.lastName || '');
-    var subEl = document.createElement('div'); subEl.className = 'card-sub';
-    subEl.textContent = loc;
-    var divEl = document.createElement('div'); divEl.className = 'divider';
-    var infoGrid = document.createElement('div'); infoGrid.className = 'info-grid';
-    infoGrid.appendChild(makeInfoItem('Age',        calcAge(p.dob)));
-    infoGrid.appendChild(makeInfoItem('Height',     p.height || '-'));
-    infoGrid.appendChild(makeInfoItem('Profession', trunc(p.occupation, 30)));
-    infoGrid.appendChild(makeInfoItem('Gotra',      p.gotra  || '-'));
-    var tags = document.createElement('div'); tags.className = 'tags';
-    var tagEl;
-    if (p.euYears)  { tagEl = document.createElement('span'); tagEl.className = 'tag';           tagEl.textContent = p.euYears;  tags.appendChild(tagEl); }
-    if (p.city)     { tagEl = document.createElement('span'); tagEl.className = 'tag highlight'; tagEl.textContent = p.city;     tags.appendChild(tagEl); }
-    body.appendChild(nameEl); body.appendChild(subEl); body.appendChild(divEl);
-    body.appendChild(infoGrid); body.appendChild(tags);
-    card.appendChild(body);
-    card.onclick = function() { openModal(p); };
-    return card;
+  } else {
+    var ph = document.createElement('div'); ph.className='photo-placeholder';
+    ph.innerHTML = (p.gender==='Female' ? '&#128105;' : '&#128104;') + '<p>Photo not uploaded</p>';
+    photoArea.appendChild(ph);
   }
-
-  function openModal(p) {
-    var photosEl = document.getElementById('modalPhotos');
-    var bodyEl   = document.getElementById('modalBody');
-    photosEl.innerHTML = '';
-    var photos = parsePhotos(p.photos);
-    for (var i = 0; i < photos.length; i++) {
-      var img = document.createElement('img');
-      img.src = photos[i]; img.alt = p.firstName || '';
-      img.onerror = function() { this.style.display = 'none'; };
-      photosEl.appendChild(img);
-    }
-    bodyEl.innerHTML = '';
-    var nameEl = document.createElement('div'); nameEl.className = 'modal-name';
-    nameEl.textContent = (p.firstName || '') + ' ' + (p.lastName || '');
-    var subEl = document.createElement('div');
-    subEl.style.cssText = 'color:var(--muted);font-size:.8rem;margin-top:4px';
-    var loc = [p.city, p.country].filter(function(x) { return !!x; }).join(', ');
-    subEl.textContent = (p.occupation || '') + (loc ? ' - ' + loc : '');
-    bodyEl.appendChild(nameEl); bodyEl.appendChild(subEl);
-    bodyEl.appendChild(makeSection('Personal Details', [
-      ['Age',        calcAge(p.dob)],
-      ['Height',     p.height],
-      ['Weight Range', p.weightRange],
-      ['Body Type',  p.bodyType],
-      ['Complexion', p.complexion],
-      ['Siblings',   p.siblings]
-    ]));
-   bodyEl.appendChild(makeSection('Location & Career', [
-      ['Country',    p.country],
-      ['City',       p.city],
-      ['Years in EU', p.euYears],
-      ['Occupation', p.occupation]
-    ]));
-    bodyEl.appendChild(makeSection('Community & Religious Details', [
-      ['Community', p.community], ['Gotra', p.gotra],
-      ['Nakshatra', p.nakshatra], ['Matha', p.matha],
-      ['Kuladeva',  p.kuladeva],  ['Native Place', p.nativePlace],
-      ['Konkani Dialect', p.dialect]
-    ]));
-    bodyEl.appendChild(makeSection('Family', [
-      ['Father', p.fatherInfo], ['Mother', p.motherInfo]
-    ]));
-    bodyEl.appendChild(makeSection('Partner Preferences', [
-      ['Preferred Location', p.prefLocation],
-      ['Horoscope Matching', p.horoscopeReq],
-      ['Preferred Height',   p.prefHeightRange],
-      ['Career Preference',  p.prefCareer]
-    ]));
-    document.getElementById('modalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
+  var badge = document.createElement('div');
+  badge.className = 'gender-badge ' + (p.gender==='Female' ? 'female' : 'male');
+  badge.textContent = p.gender || '';
+  photoArea.appendChild(badge);
+  card.appendChild(photoArea);
+  var loc  = [p.city, p.country].filter(function(x){ return !!x; }).join(', ');
+  var body = document.createElement('div'); body.className = 'card-body';
+  var nameEl = document.createElement('div'); nameEl.className = 'card-name';
+  nameEl.textContent = (p.firstName||'') + ' ' + (p.lastName||'');
+  var subEl = document.createElement('div'); subEl.className = 'card-sub'; subEl.textContent = loc;
+  var divEl = document.createElement('div'); divEl.className = 'divider';
+  var infoGrid = document.createElement('div'); infoGrid.className = 'info-grid';
+  infoGrid.appendChild(makeInfoItem('Age',        calcAge(p.dob)));
+  infoGrid.appendChild(makeInfoItem('Height',     p.height || '-'));
+  infoGrid.appendChild(makeInfoItem('Profession', trunc(p.occupation, 30)));
+  infoGrid.appendChild(makeInfoItem('Gotra',      p.gotra  || '-'));
+  var tags = document.createElement('div'); tags.className = 'tags';
+  var tagEl;
+  if (p.euYears) { tagEl=document.createElement('span'); tagEl.className='tag';           tagEl.textContent=p.euYears; tags.appendChild(tagEl); }
+  if (p.city)    { tagEl=document.createElement('span'); tagEl.className='tag highlight'; tagEl.textContent=p.city;    tags.appendChild(tagEl); }
+  body.appendChild(nameEl); body.appendChild(subEl); body.appendChild(divEl);
+  body.appendChild(infoGrid); body.appendChild(tags);
+  card.appendChild(body);
+  card.onclick = function(){ openModal(p); };
+  return card;
+}
+function openModal(p) {
+  var photosEl = document.getElementById('modalPhotos');
+  var bodyEl   = document.getElementById('modalBody');
+  photosEl.innerHTML = '';
+  var photos = parsePhotos(p.photos);
+  for (var i = 0; i < photos.length; i++) {
+    var img = document.createElement('img');
+    img.src = photos[i]; img.alt = p.firstName || '';
+    img.onerror = function(){ this.style.display='none'; };
+    photosEl.appendChild(img);
   }
-
-  function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
-  function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModalDirect(); });
-
-  function makeInfoItem(lbl, val) {
-    var div = document.createElement('div'); div.className = 'info-item';
-    var l = document.createElement('label'); l.textContent = lbl;
-    var sp = document.createElement('span'); sp.textContent = val || '-';
-    div.appendChild(l); div.appendChild(sp); return div;
-  }
-  function makeField(lbl, val) {
-    var div = document.createElement('div'); div.className = 'modal-field';
-    var l = document.createElement('label'); l.textContent = lbl;
-    var sp = document.createElement('span'); sp.textContent = val || '-';
-    div.appendChild(l); div.appendChild(sp); return div;
-  }
-  function makeSection(title, fields) {
-    var sec = document.createElement('div'); sec.className = 'modal-section';
-    var h3  = document.createElement('h3');  h3.textContent = title;
-    var grid = document.createElement('div'); grid.className = 'modal-grid';
-    sec.appendChild(h3);
-    for (var i = 0; i < fields.length; i++) grid.appendChild(makeField(fields[i][0], fields[i][1]));
-    sec.appendChild(grid); return sec;
-  }
-
-  var regBtn = document.createElement('a');
-  regBtn.href = 'https://docs.google.com/forms/d/e/1FAIpQLSfECQUPLBq_W5qDUrnp0O8ayEVHp7BYnSzOaKevWUIfFzYh-w/viewform';
-  regBtn.target = '_blank';
-  regBtn.rel = 'noopener noreferrer';
-  regBtn.style.cssText = 'padding:8px 18px;background:var(--gold);color:var(--dark);border-radius:4px;font-size:.78rem;font-weight:500;text-decoration:none;letter-spacing:.05em;white-space:nowrap;';
-  regBtn.textContent = 'Register Profile';
-  document.querySelector('header').appendChild(regBtn);
-  
-  loadProfiles();
+  bodyEl.innerHTML = '';
+  var nameEl = document.createElement('div'); nameEl.className = 'modal-name';
+  nameEl.textContent = (p.firstName||'') + ' ' + (p.lastName||'');
+  var subEl = document.createElement('div');
+  subEl.style.cssText = 'color:var(--muted);font-size:.8rem;margin-top:4px';
+  var loc = [p.city, p.country].filter(function(x){ return !!x; }).join(', ');
+  subEl.textContent = (p.occupation||'') + (loc ? ' - ' + loc : '');
+  bodyEl.appendChild(nameEl); bodyEl.appendChild(subEl);
+  bodyEl.appendChild(makeSection('Personal Details', [
+    ['Age',calcAge(p.dob)],['Height',p.height],['Weight Range',p.weightRange],
+    ['Body Type',p.bodyType],['Complexion',p.complexion],['Siblings',p.siblings]
+  ]));
+  bodyEl.appendChild(makeSection('Location & Career', [
+    ['Country',p.country],['City',p.city],['Years in EU',p.euYears],['Occupation',p.occupation]
+  ]));
+  bodyEl.appendChild(makeSection('Community & Religious Details', [
+    ['Community',p.community],['Gotra',p.gotra],['Nakshatra',p.nakshatra],
+    ['Matha',p.matha],['Kuladeva',p.kuladeva],['Native Place',p.nativePlace],['Konkani Dialect',p.dialect]
+  ]));
+  bodyEl.appendChild(makeSection('Family', [['Father',p.fatherInfo],['Mother',p.motherInfo]]));
+  bodyEl.appendChild(makeSection('Partner Preferences', [
+    ['Preferred Location',p.prefLocation],['Horoscope Matching',p.horoscopeReq],
+    ['Preferred Height',p.prefHeightRange],['Career Preference',p.prefCareer]
+  ]));
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e){ if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect(){ document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow=''; }
+function makeInfoItem(lbl, val) {
+  var div=document.createElement('div'); div.className='info-item';
+  var l=document.createElement('label'); l.textContent=lbl;
+  var sp=document.createElement('span'); sp.textContent=val||'-';
+  div.appendChild(l); div.appendChild(sp); return div;
+}
+function makeField(lbl, val) {
+  var div=document.createElement('div'); div.className='modal-field';
+  var l=document.createElement('label'); l.textContent=lbl;
+  var sp=document.createElement('span'); sp.textContent=val||'-';
+  div.appendChild(l); div.appendChild(sp); return div;
+}
+function makeSection(title, fields) {
+  var sec=document.createElement('div'); sec.className='modal-section';
+  var h3=document.createElement('h3'); h3.textContent=title;
+  var grid=document.createElement('div'); grid.className='modal-grid';
+  sec.appendChild(h3);
+  for(var i=0;i<fields.length;i++) grid.appendChild(makeField(fields[i][0],fields[i][1]));
+  sec.appendChild(grid); return sec;
+}
 </script>
 </body>
 </html>
